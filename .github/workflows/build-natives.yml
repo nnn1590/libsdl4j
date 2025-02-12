@@ -17,41 +17,10 @@ jobs:
       sdl_changed: ${{ steps.check_sdl.outputs.sdl_changed }}
 
     steps:
-      - name: Check out main repo
-        uses: actions/checkout@v4
-        with:
-          ref: SDL3
-
-      - name: Read current SDL version
-        uses: BrycensRanch/read-properties-action@v1
-        id: read_current
-        with:
-          file: gradle.properties
-          property: sdlCommit
-
-      - name: Check out ci-data branch
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.repository }}
-          path: ci-data
-          ref: ci-data
-
-      - name: Compare with last successful version
+      - name: Set sdl_changed=true
         id: check_sdl
         run: |
-          CURRENT_SDL_VERSION="${{ steps.read_current.outputs.sdlCommit }}"
-          LAST_SDL_VERSION="$(cat ci-data/last_successful_sdl.txt || echo '0.0.0')"
-          
-          echo "Current: $CURRENT_SDL_VERSION"
-          echo "Last successful: $LAST_SDL_VERSION"
-          
-          if [ "$CURRENT_SDL_VERSION" = "$LAST_SDL_VERSION" ]; then
-            echo "SDL version not changed since last successful build."
-            echo "sdl_changed=false" >> $GITHUB_OUTPUT
-          else
-            echo "SDL version changed!"
-            echo "sdl_changed=true" >> $GITHUB_OUTPUT
-          fi
+          echo "sdl_changed=true" >> $GITHUB_OUTPUT
 
   build-windows:
     runs-on: ubuntu-latest
